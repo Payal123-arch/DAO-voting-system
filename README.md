@@ -49,4 +49,5 @@ Our vision is to democratize organizational decision-making by providing a trans
 10. **Proposal Templates** - Create standardized templates for common types of proposals.
 
 Contract address: 0x80084ed364EB5a8951f343362a882e06cCCD35E8
-![image](https://github.com/user-attachments/assets/8962a271-ab11-4a67-81f6-b17d7618d87d)
+![Screenshot 2025-05-17 190602](https://github.com/user-attachments/assets/ac85d9bb-f20d-4327-844e-d4baa16a3ede)
+
