@@ -30,7 +30,7 @@ contract DAOVoting {
     uint256 public votingPeriod = 3 days;
     mapping(uint256 => Proposal) public proposals;
     mapping(address => bool) public members;
-    uint256 public memberCount;
+    address[] public memberList;
 
     event ProposalCreated(uint256 indexed proposalId, string description, uint256 deadline);
     event Voted(uint256 indexed proposalId, address indexed voter, bool support);
@@ -52,27 +52,24 @@ contract DAOVoting {
     constructor() {
         admin = msg.sender;
         members[msg.sender] = true;
-        memberCount = 1;
+        memberList.push(msg.sender);
         emit MemberAdded(msg.sender);
     }
 
     function createProposal(string memory _description) external onlyMembers returns (uint256) {
         proposalCount++;
         uint256 proposalId = proposalCount;
-
         Proposal storage proposal = proposals[proposalId];
         proposal.id = proposalId;
         proposal.description = _description;
         proposal.deadline = block.timestamp + votingPeriod;
         proposal.executed = false;
-
         emit ProposalCreated(proposalId, _description, proposal.deadline);
         return proposalId;
     }
 
     function vote(uint256 _proposalId, bool _support) external onlyMembers {
         Proposal storage proposal = proposals[_proposalId];
-
         require(block.timestamp < proposal.deadline, "Voting period has ended");
         require(!proposal.hasVoted[msg.sender], "Already voted");
 
@@ -89,7 +86,6 @@ contract DAOVoting {
 
     function executeProposal(uint256 _proposalId) external {
         Proposal storage proposal = proposals[_proposalId];
-
         require(block.timestamp >= proposal.deadline, "Voting period not yet ended");
         require(!proposal.executed, "Proposal already executed");
         require(proposal.forVotes > proposal.againstVotes, "Proposal did not pass");
@@ -102,15 +98,25 @@ contract DAOVoting {
     function addMember(address _member) external onlyAdmin {
         require(!members[_member], "Already a member");
         members[_member] = true;
-        memberCount++;
+        memberList.push(_member);
         emit MemberAdded(_member);
     }
 
     function removeMember(address _member) external onlyAdmin {
         require(members[_member], "Not a member");
         require(_member != admin, "Cannot remove admin");
+
         members[_member] = false;
-        memberCount--;
+
+        // Remove from memberList
+        for (uint256 i = 0; i < memberList.length; i++) {
+            if (memberList[i] == _member) {
+                memberList[i] = memberList[memberList.length - 1];
+                memberList.pop();
+                break;
+            }
+        }
+
         emit MemberRemoved(_member);
     }
 
@@ -125,8 +131,6 @@ contract DAOVoting {
             executed: proposal.executed
         });
     }
-
-    // ✅ New Functions Below
 
     function changeVotingPeriod(uint256 _newPeriod) external onlyAdmin {
         require(_newPeriod > 0, "Voting period must be positive");
@@ -151,7 +155,7 @@ contract DAOVoting {
         for (uint256 i = 1; i <= proposalCount; i++) {
             if (block.timestamp < proposals[i].deadline && !proposals[i].executed) {
                 Proposal storage p = proposals[i];
-                activeProposals[index] = ProposalInfo({
+                activeProposals[index++] = ProposalInfo({
                     id: p.id,
                     description: p.description,
                     forVotes: p.forVotes,
@@ -159,14 +163,14 @@ contract DAOVoting {
                     deadline: p.deadline,
                     executed: p.executed
                 });
-                index++;
             }
         }
+
         return activeProposals;
     }
 
     function getMemberCount() external view returns (uint256) {
-        return memberCount;
+        return memberList.length;
     }
 
     function resetProposal(uint256 _proposalId) external onlyAdmin {
@@ -177,9 +181,12 @@ contract DAOVoting {
         proposal.againstVotes = 0;
         proposal.deadline = block.timestamp + votingPeriod;
 
-        // Reset all votes (insecure in production, just for example/testing)
-        for (uint256 i = 0; i < memberCount; i++) {
-            proposal.hasVoted[address(uint160(i))] = false;
+        for (uint256 i = 0; i < memberList.length; i++) {
+            proposal.hasVoted[memberList[i]] = false;
         }
+    }
+
+    function getAllMembers() external view returns (address[] memory) {
+        return memberList;
     }
 }
