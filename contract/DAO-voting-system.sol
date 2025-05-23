@@ -7,7 +7,7 @@ pragma solidity ^0.8.20;
  */
 contract DAOVoting {
     struct Proposal {
-        uint256 id;
+        uint256 id
         string description;
         uint256 forVotes;
         uint256 againstVotes;
