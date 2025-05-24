@@ -11,7 +11,7 @@ contract DAOVoting {
         string description;
         uint256 forVotes;
         uint256 againstVotes;
-        uint256 deadline;
+        uint256 deadline
         bool executed;
         mapping(address => bool) hasVoted;
     }
