@@ -128,7 +128,7 @@ contract DAOVoting {
             forVotes: proposal.forVotes,
             againstVotes: proposal.againstVotes,
             deadline: proposal.deadline,
-            executed: proposal.executed
+
         });
     }
 
