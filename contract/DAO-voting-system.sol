@@ -9,7 +9,7 @@ contract DAOVoting {
     struct Proposal {
         uint256 id
         string description;
-        uint256 forVotes;
+        uint256 forVotes;\
         uint256 againstVotes;
         uint256 deadline
         bool executed;
