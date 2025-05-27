@@ -7,11 +7,11 @@ pragma solidity ^0.8.20;
  */
 contract DAOVoting {
     struct Proposal {
-        uint256 id
+        uint256 id;
         string description;
-        uint256 forVotes;\
+        uint256 forVotes;
         uint256 againstVotes;
-        uint256 deadline
+        uint256 deadline;
         bool executed;
         mapping(address => bool) hasVoted;
     }
@@ -91,7 +91,6 @@ contract DAOVoting {
         require(proposal.forVotes > proposal.againstVotes, "Proposal did not pass");
 
         proposal.executed = true;
-
         emit ProposalExecuted(_proposalId);
     }
 
@@ -108,7 +107,6 @@ contract DAOVoting {
 
         members[_member] = false;
 
-        // Remove from memberList
         for (uint256 i = 0; i < memberList.length; i++) {
             if (memberList[i] == _member) {
                 memberList[i] = memberList[memberList.length - 1];
@@ -128,7 +126,7 @@ contract DAOVoting {
             forVotes: proposal.forVotes,
             againstVotes: proposal.againstVotes,
             deadline: proposal.deadline,
-
+            executed: proposal.executed
         });
     }
 
