@@ -16,7 +16,7 @@ contract DAOVoting {
         mapping(address => bool) hasVoted;
     }
 
-    struct ProposalInfo {
+    struct Proposa
         uint256 id;
         string description;
         uint256 forVotes;
